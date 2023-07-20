@@ -89,3 +89,47 @@
 ;; than the examples in the book, except C doesn't allow you to create functions
 ;; as variables, if let-over-lambda-returner could only return a singleton,
 ;; it would be effectively identical to C's static functions
+
+(defun block-scanner (trigger-string)
+  (let* ((trig (coerce trigger-string 'list))
+         (curr trig))
+    (lambda (data-string)
+      (let ((data (coerce data-string 'list)))
+        (dolist (c data)
+          ;(format 't "~s ~s~%" c (coerce curr 'string))
+          (if curr
+              (setq curr
+                    (if (char= (car curr) c)
+                        (cdr curr)
+                        (if (char= c (car trig)) ;this fixes duplicate prefixes
+                            (cdr trig)
+                            trig)))))
+        (not curr)))))
+
+(defun block-scanner-test ()
+  (let ((scanner (block-scanner "jihad"))
+        (scanner2 (block-scanner "jihad")))
+    (values
+     (list
+      (funcall scanner "We will start ")
+      (funcall scanner "the jiji")
+      (funcall scanner "had tomorrow."))
+     (list
+      (funcall scanner2 "We will start ")
+      (funcall scanner2 "the ji")
+      (funcall scanner2 "had tomorrow.")))))
+;(nil nil t)
+
+(let ((direction 'up))
+  (defun toggle-counter-direction ()
+    (setq direction
+          (if (eq direction 'up)
+              'down
+              'up)))
+  (defun counter-class ()
+    (let ((counter 0))
+      (lambda ()
+        (if (eq direction 'up)
+            (incf counter)
+            (decf counter))))))
+
