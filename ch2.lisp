@@ -133,3 +133,6 @@
             (incf counter)
             (decf counter))))))
 
+(defun counter-class-test ()
+  (let ((ct (counter-class)))
+    (list (funcall ct) (funcall ct) (toggle-counter-direction) (funcall ct) (funcall ct))))
